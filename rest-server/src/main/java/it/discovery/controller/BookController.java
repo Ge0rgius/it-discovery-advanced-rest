@@ -8,6 +8,9 @@ import it.discovery.repository.BookRepository;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,12 +29,14 @@ public class BookController {
 
     @GetMapping
     @Timed("books.findAll")
+    @Cacheable("books")
     public List<BookDTO> findAll() {
         return bookRepository.findAll().stream()
                 .map(book -> modelMapper.map(book, BookDTO.class)).toList();
     }
 
     @GetMapping("{id}")
+    @Cacheable("book")
     public ResponseEntity<Book> findById(@PathVariable int id) {
         if (id <= 0) {
             //return ResponseEntity.badRequest().build();
@@ -53,11 +58,13 @@ public class BookController {
 
     @PutMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @CachePut(value = "books", key = "#id")
     public void update(@PathVariable int id, @Valid @RequestBody BookDTO book) {
         bookRepository.save(modelMapper.map(book, Book.class));
     }
 
     @DeleteMapping
+    @CacheEvict(key = "#id")
     public void delete(@PathVariable int id) {
         bookRepository.delete(id);
     }
