@@ -1,0 +1,5 @@
+=== Shop API specification
+
+include::{snippets}/book-controller-test/save_title-is-empty_bad-request/curl-request.adoc[]
+
+include::{snippets}/book-controller-test/save_title-is-empty_bad-request/http-request.adoc[]
