@@ -71,7 +71,6 @@ public class BookControllerTest {
         mockMvc.perform(post("/api/books").contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(jacksonTester.write(bookDTO).getJson())).andExpect(status().isBadRequest());
 
-        //TODO fix (another invocation in RestApplication)
         verify(bookRepository, never()).save(any(Book.class));
     }
 
