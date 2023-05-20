@@ -37,6 +37,7 @@ public class BookController {
     }
 
     @GetMapping("{id}")
+    //TODO How to support ResponseEntity<Book> and BookDTO values for the same cache?
     @CacheResult(cacheName = "book")
     public ResponseEntity<Book> findById(@PathVariable int id) {
         if (id <= 0) {

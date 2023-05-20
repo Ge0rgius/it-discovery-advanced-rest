@@ -5,6 +5,14 @@
         http://www.ehcache.org/schema/ehcache-core-3.0.xsd">
 
 	<cache alias="books">
+		<key-type>org.springframework.cache.interceptor.SimpleKey</key-type>
+		<value-type>java.util.ImmutableCollections$ListN</value-type>
+		<heap unit="entries">200</heap>
+		<heap-store-settings>
+			<max-object-size>2000</max-object-size>
+		</heap-store-settings>
+	</cache>
+	<cache alias="book">
 		<key-type>java.lang.Integer</key-type>
 		<value-type>it.discovery.model.Book</value-type>
 		<heap unit="entries">200</heap>
