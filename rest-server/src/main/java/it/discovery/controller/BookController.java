@@ -37,7 +37,7 @@ public class BookController {
     @Autowired
     private BookFactory bookFactory;
 
-    @GetMapping
+    @GetMapping//(produces = MediaType.APPLICATION_CBOR_VALUE)
     @Timed("books.findAll")
     @CacheResult(cacheName = "books")
     @Operation(summary = "Returns all the existing books in the store", responses = {
