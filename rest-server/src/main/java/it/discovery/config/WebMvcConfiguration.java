@@ -4,6 +4,7 @@ import it.discovery.dto.BookDTO;
 import it.discovery.dto.OrderDTO;
 import it.discovery.model.Book;
 import it.discovery.model.Order;
+import it.discovery.version.v1.BookV1DTO;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,12 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
         TypeMap<BookDTO, Book> map2 = mapper.createTypeMap(BookDTO.class, Book.class);
         map2.addMapping(BookDTO::getTitle, Book::setName);
+
+        TypeMap<BookV1DTO, Book> map3 = mapper.createTypeMap(BookV1DTO.class, Book.class);
+        map3.addMapping(BookV1DTO::getTitle, Book::setName);
+
+        TypeMap<Book, BookV1DTO> map4 = mapper.createTypeMap(Book.class, BookV1DTO.class);
+        map4.addMapping(Book::getName, BookV1DTO::setTitle);
 
         TypeMap<Order, OrderDTO> orderMap = mapper.createTypeMap(Order.class, OrderDTO.class);
         orderMap.addMapping(order -> order.getBook().getName(), OrderDTO::setTitle);

@@ -7,6 +7,9 @@ import it.discovery.dto.BookDTO;
 import it.discovery.error.handling.BookNotFoundException;
 import it.discovery.model.Book;
 import it.discovery.repository.BookRepository;
+import it.discovery.version.ApiVersion;
+import it.discovery.version.BookFactory;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,7 @@ import javax.cache.annotation.CachePut;
 import javax.cache.annotation.CacheRemove;
 import javax.cache.annotation.CacheResult;
 import javax.cache.annotation.CacheValue;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -30,15 +34,19 @@ public class BookController {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private BookFactory bookFactory;
+
     @GetMapping
     @Timed("books.findAll")
     @CacheResult(cacheName = "books")
     @Operation(summary = "Returns all the existing books in the store", responses = {
             @ApiResponse(responseCode = "200", description = "Success")
     })
-    public List<BookDTO> findAll() {
+    public List<?> findAll(@RequestParam(name = "version", required = false)
+                           ApiVersion version) {
         return bookRepository.findAll().stream()
-                .map(book -> modelMapper.map(book, BookDTO.class)).toList();
+                .map(book -> bookFactory.transform(book, version)).toList();
     }
 
     @GetMapping("{id}")
@@ -63,7 +71,11 @@ public class BookController {
             @ApiResponse(description = "Success", responseCode = "201"),
             @ApiResponse(description = "Validation failed", responseCode = "400")
     })
-    public void save(@Valid @RequestBody BookDTO book) {
+    public void save(/*@Valid @RequestBody BookDTO book*/HttpServletRequest request,
+                                                         @RequestParam(name = "version", required = false)
+                                                         ApiVersion version) throws IOException {
+        byte[] bytes = request.getInputStream().readAllBytes();
+        Book book = bookFactory.untransform(bytes, version);
         bookRepository.save(modelMapper.map(book, Book.class));
     }
 
