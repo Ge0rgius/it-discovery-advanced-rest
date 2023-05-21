@@ -54,15 +54,11 @@ public class BookController {
     @CacheResult(cacheName = "book")
     public ResponseEntity<Book> findById(@PathVariable int id) {
         if (id <= 0) {
-            //return ResponseEntity.badRequest().build();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-//        return bookRepository.findById(id).map(ResponseEntity::ok)
-//                .orElse(ResponseEntity.notFound().build());
-        return bookRepository.findById(id).map(ResponseEntity::ok)
+        return bookRepository.findById(id).map(book ->
+                        ResponseEntity.ok().eTag(book.getVersion().toString()).body(book))
                 .orElseThrow(() -> new BookNotFoundException(id));
-//        return bookRepository.findById(id).map(ResponseEntity::ok)
-//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found: " + id));
     }
 
     @PostMapping

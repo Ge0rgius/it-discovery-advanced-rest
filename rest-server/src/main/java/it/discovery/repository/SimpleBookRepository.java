@@ -32,9 +32,9 @@ public class SimpleBookRepository implements BookRepository {
         return new ArrayList<>(books.values());
     }
 
-	@Override
-	public void save(Book book) {
-		if (book.getId() == 0) {
+    @Override
+    public void save(Book book) {
+        if (book.getId() == 0) {
             int id = counter.incrementAndGet();
             book.setId(id);
             books.put(id, book);
@@ -42,20 +42,21 @@ public class SimpleBookRepository implements BookRepository {
 
             publisher.publishEvent(new BookAddedEvent(book));
         } else {
-			books.put(book.getId(), book);
-			System.out.println("*** Book with id=" + book.getId() + " was updated");
-		}
-	}
+            books.put(book.getId(), book);
+            System.out.println("*** Book with id=" + book.getId() + " was updated");
+        }
+        book.incrementVersion();
+    }
 
-	@Override
-	public boolean delete(int id) {
-		if (!books.containsKey(id)) {
-			return false;
-		}
+    @Override
+    public boolean delete(int id) {
+        if (!books.containsKey(id)) {
+            return false;
+        }
 
-		books.remove(id);
-		System.out.println("*** Book with id=" + id + " was deleted");
-		return true;
-	}
+        books.remove(id);
+        System.out.println("*** Book with id=" + id + " was deleted");
+        return true;
+    }
 
 }

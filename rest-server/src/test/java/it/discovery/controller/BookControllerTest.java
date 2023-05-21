@@ -3,6 +3,8 @@ package it.discovery.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.discovery.RestApplication;
 import it.discovery.dto.BookDTO;
+import it.discovery.model.Book;
+import it.discovery.repository.BookRepository;
 import it.discovery.version.v1.BookV1DTO;
 import it.discovery.version.v2.BookV2DTO;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,8 +24,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(classes = RestApplication.class, webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
@@ -30,6 +32,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class BookControllerTest {
     @Autowired
     MockMvc mockMvc;
+
+    @Autowired
+    BookRepository bookRepository;
 
     static final ObjectMapper MAPPER = new ObjectMapper().findAndRegisterModules();
 
@@ -39,6 +44,16 @@ public class BookControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/books")).andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].title", equalTo("REST API")));
+    }
+
+    @Test
+    @DisplayName("GET /api/books/1 Returns single book with ETag header")
+    void findById_bookExists_eTagReturned() throws Exception {
+        Book book = bookRepository.findById(1).orElseThrow();
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/books/1")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.title", equalTo("REST API")))
+                .andExpect(header().string(HttpHeaders.ETAG, "\"" + book.getVersion().toString() + "\""));
     }
 
     @Test

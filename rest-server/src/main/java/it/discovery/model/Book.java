@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Getter
 @Setter
@@ -24,6 +25,8 @@ public class Book {
     private int amount;
 
     private List<Order> orders;
+
+    private AtomicInteger version = new AtomicInteger();
 
     public Book() {
         orders = new ArrayList<>();
@@ -56,5 +59,9 @@ public class Book {
 
     public boolean hasOrders() {
         return orders != null;
+    }
+
+    public void incrementVersion() {
+        version.incrementAndGet();
     }
 }
