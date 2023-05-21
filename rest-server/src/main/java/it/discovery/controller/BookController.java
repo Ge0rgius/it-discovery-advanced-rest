@@ -1,6 +1,8 @@
 package it.discovery.controller;
 
 import io.micrometer.core.annotation.Timed;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import it.discovery.dto.BookDTO;
 import it.discovery.error.handling.BookNotFoundException;
 import it.discovery.model.Book;
@@ -31,6 +33,9 @@ public class BookController {
     @GetMapping
     @Timed("books.findAll")
     @CacheResult(cacheName = "books")
+    @Operation(summary = "Returns all the existing books in the store", responses = {
+            @ApiResponse(responseCode = "200", description = "Success")
+    })
     public List<BookDTO> findAll() {
         return bookRepository.findAll().stream()
                 .map(book -> modelMapper.map(book, BookDTO.class)).toList();
@@ -54,6 +59,10 @@ public class BookController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Adds new book", responses = {
+            @ApiResponse(description = "Success", responseCode = "201"),
+            @ApiResponse(description = "Validation failed", responseCode = "400")
+    })
     public void save(@Valid @RequestBody BookDTO book) {
         bookRepository.save(modelMapper.map(book, Book.class));
     }

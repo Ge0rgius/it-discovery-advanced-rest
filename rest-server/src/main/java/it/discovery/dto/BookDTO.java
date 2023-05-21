@@ -1,5 +1,6 @@
 package it.discovery.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import it.discovery.validator.TitleConstraint;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
@@ -11,11 +12,14 @@ import java.util.List;
 
 @Getter
 @Setter
+@Schema(description = "Book element")
 public class BookDTO {
     @PositiveOrZero
+    @Schema(description = "Unique book identifier")
     private int id;
 
     @NotEmpty
+    @Schema(description = "Book author")
     private String author;
 
     @TitleConstraint
